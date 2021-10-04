@@ -1,12 +1,10 @@
 from copy import deepcopy
 import numpy as np
 from scipy.optimize import approx_fprime
-from sys import path
-path.append('.')
 
 
-from src.base import ConditionalDistribution
-from src.models import MarkovModel
+from pymm.base import ConditionalDistribution
+from pymm.models import MarkovModel
 
 
 def _test_grad(model, x: np.ndarray):

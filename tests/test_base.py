@@ -6,11 +6,9 @@ root/tests/*.py
 """
 from copy import deepcopy
 import numpy as np
-from sys import path
-path.append('.')
 
 
-from src.base import ConditionalDistribution
+from pymm.base import ConditionalDistribution
 
 
 def _test_getset(K: int, M: int):

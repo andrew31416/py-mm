@@ -1,10 +1,8 @@
 import numpy as np
-from sys import path
 from typing import List
-path.append('.')
 
 
-from src.models import MarkovModel
+from pymm.models import MarkovModel
 
 
 def test_logprob_MarkovModel():
