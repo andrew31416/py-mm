@@ -1,3 +1,8 @@
+"""
+Base class for conditional state probabilities.
+"""
+
+
 import numpy as np
 from scipy.sparse import csr_matrix
 

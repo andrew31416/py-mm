@@ -1,15 +1,27 @@
+"""
+Module for categorical univariate Markov Model.
+"""
+
 from copy import deepcopy
-import numpy as np
 from scipy.sparse import csr_matrix
 from scipy.optimize import LinearConstraint, Bounds, minimize
 from typing import List, Union
-
+import numpy as np
 
 from .base import ConditionalDistribution
 
 
 class MarkovModel:
     def __init__(self, K: int, M: int, random_init: bool = False):
+        """
+        Keyword arguments
+        -----------------
+        K: int -- number of categores for univariate data
+        M: int -- order of Markov Model
+        random_init: bool, default = False -- whether to instantiate
+            the transition probabilities randomly. If False, 
+            transition states are instantiated uniformly.
+        """
         self.K = K
         self.M = M
 
@@ -227,13 +239,13 @@ class MarkovModel:
         c1.shape = (n1, d1) -- n1 linear constraints and d1 associated
             parameters.
         """
-        (n1, d1) = c1.shape
-        (n2, d2) = c2.shape
+        (nn1, dd1) = c1.shape
+        (nn2, dd2) = c2.shape
 
         # shape = [n1+n2, d1+d2]
-        C = csr_matrix((n1+n2, d1+d2))
+        C = csr_matrix((nn1+nn2, dd1+dd2))
 
-        C[:n1, :d1] = c1[:, :]
-        C[n1:, d1:] = c2[:, :]
+        C[:nn1, :dd1] = c1[:, :]
+        C[nn1:, dd1:] = c2[:, :]
 
         return C
