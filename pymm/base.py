@@ -13,6 +13,26 @@ class ConditionalDistribution:
     a M^th order Markox sequence.
     """
     def __init__(self, K: int, M: int, random_init: bool = False):
+        """
+        Keyword arguments
+        -----------------
+        K: int -- the number of possible values of the categorical variable.
+            K can only take integer values greater then 1.
+        M: int -- the order of the Markov model. M=0 corresponds to 
+            p(x_n|x_{n-1},...x_1) = p(x_n). M cannot be less than 0.
+        random_init: bool, default = False -- whether or not to instaniate
+            transition probability matrix between states uniformly (when True)
+            or randomly (when False). Useful for debugging and toy examples.
+
+        Examples
+        --------
+        > from pymm.base import ConditionalDistribution
+        >
+        > # imagine data with 2 values of categorical variable
+        > # create a 0th order Markov model - transition probabilities
+        > # are independent of previous states.
+        > model = ConditionalDistribution(K=2, M=0)
+        """
         if K < 2:
             raise ValueError('Must have at least 2 possible '
                              + ' categorical value.')
@@ -32,7 +52,7 @@ class ConditionalDistribution:
 
     def init_A(self, random: bool = False):
         """
-        Instantiate and set state transition probabilities
+        Instantiate and set state transition probabilities.
         """
         if random:
             # N(0,1)
