@@ -53,6 +53,21 @@ class ConditionalDistribution:
     def init_A(self, random: bool = False):
         """
         Instantiate and set state transition probabilities.
+
+        Keyword arguments
+        -----------------
+        random: bool, default = False -- whether to instaniate
+            state transition probabilities uniformly or randomly.
+
+        Examples
+        --------
+        > from pymm.base import ConditionalDistribution
+        >
+        > # initiate weights uniformly
+        > model = ConditionalDistribution(K=3, M=0, random_init=False)
+        >
+        > # oops, changed our mind - re-instantiate ranomdly
+        > model.init_A(random=True)
         """
         if random:
             # N(0,1)
@@ -81,6 +96,20 @@ class ConditionalDistribution:
 
         Assume that elements of *args are integers in the range 0 to K-1
         inclusive.
+
+        Examples
+        --------
+        > from pymm.base import ConditionalDistribution
+        >
+        > 2nd order Markov model, 3 categorical values.
+        > model = ConditionalDistribution(K=3, M=2)
+        >
+        > x1 = 0
+        > x2 = 2
+        > x3 = 1
+        >
+        > # p(x3|x2, x1)
+        > p = model.prob(x3, x2, x1)
         """
         if len(args) != self.M+1:
             raise Exception('Input shape doesnt match expected shape')
@@ -120,6 +149,20 @@ class ConditionalDistribution:
         Keyword arguments
         -----------------
         A_small, np.ndarray, shape = [(K-1)*K^M, ]
+
+        Examples
+        --------
+        > from pymm.base import ConditionalDistribution
+        >
+        > model = ConditionalDistribution(K=2, M=1)
+        >
+        > # state transition probabilities
+        > trans_probs = np.asarray([[0.2, 0.8],
+                                    [0.3, 0.7]]
+                                   )
+        >
+        > # 1-d array anticipated
+        > model.set_params(trans_probs.flatten())
         """
         # rank M tensor, shape = (K-1, K, ...,K)
         A = np.reshape(A_small, tuple([self.K-1]+[self.K]*self.M))
