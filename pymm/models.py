@@ -21,6 +21,14 @@ class MarkovModel:
         random_init: bool, default = False -- whether to instantiate
             the transition probabilities randomly. If False, 
             transition states are instantiated uniformly.
+
+        Examples
+        --------
+        > from pymm.models import MarkovModel
+        >
+        > model = MarkovModel(K=2, M=0)
+        >
+        > print(f'{model.M}th order Markov model with {model.K} categorical values')
         """
         self.K = K
         self.M = M
@@ -38,6 +46,27 @@ class MarkovModel:
         """
         Returns ln p(x0) + ln p(x1|x0) ... + ln p(x_M-1|...x0)
                 + sum_n p(x_n | x_n-1...)
+
+        Keyword arguments
+        -----------------
+        x: np.ndarray, shape = (N, ) -- sequence of univariate
+            categorical values. Sequence is ordered left to right
+            such that x = (x_0, x_1, x_2, ..., x_{N-1}).
+
+        Examples
+        --------
+        > import numpy as np
+        >
+        > from pymm.models import MarkovModel
+        > 
+        > model = MarkovModel(K=2, M=0)
+        >
+        > print(f'ln p(0, 1, 1) = {model.log_prob(np.asarray([0, 1, 1]))}')
+        > print(f'ln p(0, 1, 1) = {np.log(0.5)*3}')
+
+        Returns
+        -------
+        float -- the log joint probability ln p(x_0, x_1, ..., x_{N-1})
         """
         if x.shape[0] < self.M+1:
             raise ValueError("Input data must have length of "
@@ -58,7 +87,22 @@ class MarkovModel:
     def get_params(self) -> np.ndarray:
         """
         Returns a 1-d array of concatenated parameters over all
-        self.models, in order of increasing order.
+        self.models, in order of increasing model order.
+
+        Examples
+        --------
+        > from pymm.models import MarkovModel
+        >
+        > model = MarkovModel(K=2, M=1)
+        >
+        > # Markov model of order 1 is composed of 2 constituent conditional
+        > # istributions: p(x_n) and p(x_n | x_{n-1}).
+        > # p(x_0, ..., x_N) = p(x_0) prod_{n=1}^N p(x_n | x_{n-1})
+        > print(f'uniform initial probabilitiy states: {model.get_params()}')
+
+        Returns
+        -------
+        np.ndarray, shape = (self.N, )
         """
         return np.concatenate(tuple(_m.get_params() for _m in self.models))
 
@@ -69,8 +113,21 @@ class MarkovModel:
 
         Keyword arguments
         -----------------
-        A_small: np.ndarray, shape = [Ntotal, ] -- All Ntotal free
-            parameters of all m^th order models.
+        A_small: np.ndarray, shape = (self.N, ) -- all free parameters
+            for all constituent conditional distribution of the Markov
+            model.
+
+        Examples
+        --------
+        > import numpy as np
+        >
+        > from pymm.models import MarkovModel
+        > 
+        > model = MarkovModel(K=3, M=0)
+        >
+        > # for 3 categorical values, there are 2 free parameters in a
+        > # 0^th order Markov model
+        > model.set_params(np.asarray([0.6, 0.2]))
         """
         # number of free params in each m^th order model
         N = [_m.N for _m in self.models]
@@ -213,14 +270,32 @@ class MarkovModel:
 
     def _grad_log_prob(self, params: np.ndarray) -> np.ndarray:
         """
-        Returns gradient of log-likelihood with respect to transition
-        state probability free parameters, assuming self.x: np.ndarray
-        has been set.
+        Returns gradient of log-likelihood with respect to transition state
+        probability free parameters, assuming self.x: np.ndarray has been set.
         """
         self.set_params(params)
         return -self.grad_log_prob(self.x)
 
     def fit(self, x: np.ndarray):
+        """
+        Maximise log-joint likelihood with respect to transition state
+        probabilities.
+
+        Keyword arguments
+        -----------------
+        x: np.ndarray -- sequential data. Elements of x has must have values
+            between [0, self.K-1] for K possible categorical values.
+
+        Examples
+        --------
+        > import numpy as np
+        >
+        > from pymm.models import MarkovModel
+        >
+        > model = MarkovModel(K=3, M=1)
+        >
+        > model.fit(np.asarray([0, 1, 0, 0, 1, 0]))
+        """
         self.x = x
 
         bounds = self.generate_bounds()
