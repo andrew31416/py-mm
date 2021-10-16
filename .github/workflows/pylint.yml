@@ -24,4 +24,4 @@ jobs:
         pylint $(find . -name "*.py" | xargs)
     - name: Running unit tests for CI
       run: |
-        pytest
+        pytest --doctest-modules
