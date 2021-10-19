@@ -260,7 +260,8 @@ class MarkovModel:
         # avoid 1/0 in gradient of likelihood with respect to probabilities
         delta = 1e-6
 
-        return LinearConstraint(C, np.zeros(C.shape[0])+delta,
+        return LinearConstraint(C,
+                                np.zeros(C.shape[0])+delta,
                                 np.ones(C.shape[0])-delta
                                 )
 
@@ -274,7 +275,10 @@ class MarkovModel:
         scipy.optimize.Bounds -- bounds to ensure that each transition state
             probability is positive and less then 1.
         """
-        return Bounds(np.zeros(self.N), np.ones(self.N))
+        # 1/0 probability
+        delta = 1e-6
+
+        return Bounds(np.zeros(self.N)+delta, np.ones(self.N)-delta)
 
     def _log_prob(self, params: np.ndarray) -> float:
         """

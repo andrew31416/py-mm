@@ -215,7 +215,7 @@ class ConditionalDistribution:
             state probabilities.
         """
         # p(x_n=K-1 | x_n-1 = j) = 1 - sum_k=0^K-2 p(x_n=k | x_n-1 = j)
-        return np.reshape(self.A[:-1, ...], (-1, ))
+        return np.reshape(self.A[:-1, ...], (-1, ), order='F')
 
     def set_params(self, A_small: np.ndarray):
         """
@@ -242,7 +242,7 @@ class ConditionalDistribution:
         >>> model.set_params(trans_probs[0, :].flatten())
         """
         # rank M tensor, shape = (K-1, K, ...,K)
-        A = np.reshape(A_small, tuple([self.K-1]+[self.K]*self.M))
+        A = np.reshape(A_small, tuple([self.K-1]+[self.K]*self.M), order='F')
 
         # rank M tensor, shape = (1, K, ..., K)
         A_ = 1.0 - np.reshape(np.sum(A, axis=0), tuple([1]+[self.K]*self.M))
