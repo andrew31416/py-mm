@@ -260,8 +260,7 @@ class MarkovModel:
         # avoid 1/0 in gradient of likelihood with respect to probabilities
         delta = 1e-6
 
-        return LinearConstraint(C,
-                                np.zeros(C.shape[0])+delta,
+        return LinearConstraint(C, np.zeros(C.shape[0])+delta,
                                 np.ones(C.shape[0])-delta
                                 )
 
@@ -297,7 +296,8 @@ class MarkovModel:
             transition state probabilities and sequential data self.x
         """
         self.set_params(params)
-        return -self.log_prob(self.x)
+        # iterate over sequences in self.X
+        return -sum(map(self.log_prob, self.X))
 
     def _grad_log_prob(self, params: np.ndarray) -> np.ndarray:
         """
@@ -305,9 +305,10 @@ class MarkovModel:
         probability free parameters, assuming self.x: np.ndarray has been set.
         """
         self.set_params(params)
-        return -self.grad_log_prob(self.x)
+        # reduce over sequences in self.X
+        return -sum(map(self.grad_log_prob, self.X))
 
-    def fit(self, x: np.ndarray):
+    def fit(self, X: Union[List[np.ndarray], np.ndarray]):
         """
         Maximise log-joint likelihood with respect to transition state
         probabilities.
@@ -327,7 +328,18 @@ class MarkovModel:
         >>>
         >>> model.fit(np.asarray([0, 1, 0, 0, 1, 0]))
         """
-        self.x = x
+        # format X to list of np.ndarrays
+        if isinstance(X, np.ndarray):
+            if len(X.shape) == 1:
+                self.X = [X]
+        elif isinstance(X, list):
+            if isinstance(X[0], int):
+                self.X = [np.asarray(X)]
+            elif isinstance(X[0], list):
+                self.X = list(map(np.asarray, self.X))
+            self.X = X
+        else:
+            raise ValueError('Unexpected input type and format')
 
         bounds = self._generate_bounds()
         constraints = self._generate_constraint()
