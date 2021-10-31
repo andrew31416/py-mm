@@ -2,7 +2,7 @@
 
 Markov models for categorical sequential data in Python. The joint probabiity
 
-<img src="https://render.githubusercontent.com/render/math?math=p(x_1, x_2,\ldots,x_N)=p(x_1)p(x_2|x_1)\ldots p(x_{M}|x_{M-1},\ldots,x_1)\prod_{n=M+1}^N p(x_n|x_{n-1},\ldots,x_{n-M})">
+<img src="https://render.githubusercontent.com/render/math?math=p(x_1, x_2,\ldots,x_N)=p(x_1)p(x_2|x_1)\ldots p(x_{M}|x_{M-1},\ldots,x_1)\prod_{n=M--1}^N p(x_n|x_{n-1},\ldots,x_{n-M})">
 
 for an ordered sequence <img src="https://render.githubusercontent.com/render/math?math=(x_1,x_2,\ldots,x_N)">  of the categorical variable <img src="https://render.githubusercontent.com/render/math?math=x"> is composed of *M+1* conditional distributions of order <img src="https://render.githubusercontent.com/render/math?math=m=[0, M]">. Each component <img src="https://render.githubusercontent.com/render/math?math=p(x_n|x_{n-1},\ldots,x_{n-m})"> is represented by a rank *m+1* tensor of transition state probabilities. These are inferred under maximum likelihood estimation of the data.
 
